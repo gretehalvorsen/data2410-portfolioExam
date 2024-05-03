@@ -11,9 +11,9 @@ from struct import *
 # I integer (unsigned long) = 4bytes and H (unsigned short integer 2 bytes)
 # see the struct official page for more info
 
-header_format = '!IIHH'
+header_format = '!HHH' #Adjusted to have 6 bytes with three short integers.
 
-#print the header size: total = 12
+#print the header size: total = 6
 print (f'size of the header = {calcsize(header_format)}')
 
 
@@ -33,7 +33,7 @@ def create_packet(seq, ack, flags, win, data):
 
 
 def parse_header(header):
-    #taks a header of 12 bytes as an argument,
+    #taks a header of 6 bytes as an argument,
     #unpacks the value based on the specified header_format
     #and return a tuple with the values
     header_from_msg = unpack(header_format, header)
@@ -52,7 +52,7 @@ def parse_flags(flags):
 #now let's create a packet with sequence number 1
 print ('\n\ncreating a packet')
 
-data = b'0' * 1460
+data = b'0' * 994
 print (f'app data for size ={len(data)}')
 
 sequence_number = 1
