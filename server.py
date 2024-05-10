@@ -1,18 +1,21 @@
 import socket
 import datetime
 import time
-from header import create_packet, send_packet, recv_packet, send_ack
+from packet import create_packet, send_packet, recv_packet, send_ack
 
 def server(args):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     server_socket.bind((args.ip, args.port))
     start_time = None  # initialize start time
     total_data = 0  # initialize total data
+    start_time = time.time()
 
     if args.file is None:
         recvd_file = open("image.jpg", "wb")
     else:
         recvd_file = open(args.file, "wb")
+
+    expected_seq = 1  # Initialize expected sequence number
 
     while True:  # Starts an infinite loop
     # Calls recv_packet function to receive a packet from the client. 
@@ -28,9 +31,9 @@ def server(args):
 
         elif fin:  # If the FIN flag of the received packet is set
             print("FIN packet is received.")  # Print a message indicating a FIN packet is received
-            recvd_file.close()  # Close the file that was being written to
             fin_ack_packet = create_packet(0, 0, 6, b'') # Create a packet with both ACK and FIN flags set (4 | 2 )
             send_packet(server_socket, fin_ack_packet, client_addr)  # Send the FIN-ACK packet back to the client
+            recvd_file.close()  # Close the file
             print(f'FIN ACK packet is sent')
             break  # Break the loop as the file transfer is complete
 
@@ -39,13 +42,27 @@ def server(args):
             print('Connection established')
             continue  # Continue to the next iteration of the loop without executing the rest of the code in the loop
 
+        elif seq == expected_seq:  # If the sequence number is the expected one
+            print(f'Packet {seq} is received')
+            if not (syn or fin or ack_flag): 
+                recvd_file.write(msg[6:])  # Write the data to the file
+            ack_packet = create_packet(0, seq, 4, b'')  # Create ACK packet
+            send_packet(server_socket, ack_packet, client_addr)  # Send ACK packet
+            print(f'ACK for packet {seq} is sent')
+            expected_seq += 1  # Increment expected sequence number
+
+        else:  # If an out-of-order packet is received
+            print(f'Out-of-order packet {seq} is received, discarding packet')
+            ack_packet = create_packet(0, expected_seq - 1, 4, b'')  # Resend ACK for last correctly received packet
+            send_packet(server_socket, ack_packet, client_addr)  # Send ACK packet
+            print(f'Resent ACK for packet {expected_seq - 1}')
+
     
-   #end_time = time.time()  # ends the timer
-   # elapsed_time = end_time - start_time  # calculates the elapsed time
-   # throughput = (total_data * 8) / (1000 * 1000 * elapsed_time)  # calculates the throughput in Mbps
-    #print('')
-    #print(f"The throughput is {throughput:.2f} Mbps")  
+    end_time = time.time()  # ends the timer
+    elapsed_time = end_time - start_time  # calculates the elapsed time
+    throughput = (total_data * 8) / (1000 * 1000 * elapsed_time)  # calculates the throughput in Mbps
+    print('')
+    print(f"The throughput is {throughput:.2f} Mbps")  
 
     print(f'Connection Closes') 
     server_socket.close()
-    
