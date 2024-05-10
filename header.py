@@ -64,7 +64,6 @@ msg = create_packet(sequence_number, acknowledgment_number, flags)
 #now let's look at the header
 #we already know that the header is in the first 6 bytes
 
-print('her')
 header_from_msg = msg[:6]
 print(len(header_from_msg))
 
