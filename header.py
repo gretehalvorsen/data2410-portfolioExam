@@ -1,107 +1,58 @@
-'''
-    #Utility functions: 1) to create a packet of 1472 bytes with header (12 bytes) (sequence number, acknowledgement number,
-    #flags and receiver window) and applicaton data (1460 bytes), and 2) to parse
-    # the extracted header from the application data. 
-
-'''
-
+# Import required libraries
 from struct import *
 
+# Define the format for the header
+header_format = '3H' # The format is 3 unsigned short integers
 
-# I integer (unsigned long) = 4bytes and H (unsigned short integer 2 bytes)
-# see the struct official page for more info
-
-header_format = '3H' #Adjusted to have 6 bytes with three short integers.
-
-#print the header size: total = 6
-print (f'size of the header = {calcsize(header_format)}')
-
-
-def create_packet(seq, ack, flags):
-    #creates a packet with header information
-    #the input arguments are sequence number, acknowledgment number and flags 
-    #struct.pack returns a bytes object containing the header values
-    #packed according to the header_format 3H
-    header = pack (header_format, seq, ack, flags)
-
-    #once we create a header, we add the application data to create a packet
-    #of 1000 bytes
+# Function to create a data packet
+def create_packet(seq, ack, flags, data):
+    # Pack the sequence number, acknowledgment number, and flags into a binary data
+    header = pack(header_format, seq, ack, flags) 
+    # Combine the header and the actual data to form the complete packet
     packet = header + data
-    print (f'packet containing header + data of size {len(packet)}') #just to show the length of the packet
+    # Return the final packet
     return packet
 
-
+# Function to parse the header of the packet
 def parse_header(header):
-    #taks a header of 6 bytes as an argument,
-    #unpacks the value based on the specified header_format
-    #and return a tuple with the values
-    header_from_msg = unpack(header_format, header)
-    #parse_flags(flags)
-    return header_from_msg
-    
+    # Unpack the header to get the sequence number, acknowledgment number, and flags
+    seq, ack, flags = unpack(header_format, header)
+    # Return these values
+    return seq, ack, flags 
+
+# Function to send a packet over a socket to a specified address
+def send_packet(socket, packet, addr):
+    # Use the socket's sendto method to send the packet to the given address
+    socket.sendto(packet, addr)
+
+# Function to receive a packet from a socket
+def recv_packet(socket, size=1000):
+    # Use the socket's recvfrom method to receive a packet, the default size is 1000 bytes
+    msg, addr = socket.recvfrom(size)
+    # Parse the header of the received message
+    seq, ack, flags = parse_header(msg[:6])
+    syn, ack_flag, fin = parse_flags(flags)
+    # Return the message, sender's address, sequence number, acknowledgment number, and flags
+    return msg, addr, seq, ack, syn, ack_flag, fin
 
 def parse_flags(flags):
-    #we only parse the first 3 fields because we're not 
-    #using rst in our implementation
     syn = flags & (1 << 3)
     ack = flags & (1 << 2)
     fin = flags & (1 << 1)
     return syn, ack, fin
 
-#now let's create a packet with sequence number 1
-print ('\n\ncreating a packet')
+# The function sends a packet with ACK flag. 
+def send_ack(socket, seq, addr):
+    ack_packet = create_packet(0, 0, 4, b'')
+    send_packet(socket, ack_packet, addr)
 
-data = b'0' * 994
-print (f'app data for size ={len(data)}')
-
-sequence_number = 1
-acknowledgment_number = 0
-flags = 0 # we are not going to set any flags when we send a data packet
-
-#msg now holds a packet, including our custom header and data
-msg = create_packet(sequence_number, acknowledgment_number, flags)
-
-#now let's look at the header
-#we already know that the header is in the first 6 bytes
-
-header_from_msg = msg[:6]
-print(len(header_from_msg))
-
-#now we get the header from the parse_header function
-#which unpacks the values based on the header_format that 
-#we specified
-seq, ack, flags = parse_header (header_from_msg)
-print(f'seq={seq}, ack={ack}, flags={flags}')
-
-#let's extract the data_from_msg that holds
-#the application data of 994 bytes
-data_from_msg = msg[6:]
-print (len(data_from_msg))
-
-
-#let's mimic an acknowledgment packet from the receiver-end
-#now let's create a packet with acknowledgement number 1
-#an acknowledgment packet from the receiver should have no data
-#only the header with acknowledgment number, ack_flag=1
-data = b'' 
-print('\n\nCreating an acknowledgment packet:')
-print (f'this is an empty packet with no data ={len(data)}')
-
-sequence_number = 0
-acknowledgment_number = 1   #an ack for the last sequnce
-
-# let's look at the last 4 bits:  S A F R
-# 0 0 0 0 represents no flags
-# 0 1 0 0  ack flag set, and the decimal equivalent is 4
-flags = 8 
-
-msg = create_packet(sequence_number, acknowledgment_number, flags)
-print (f'this is an acknowledgment packet of header size={len(msg)}')
-
-#let's parse the header
-seq, ack, flags = parse_header (msg) #it's an ack message with only the header
-print(f'seq={seq}, ack={ack}, flags={flags}')
-
-#now let's parse the flag field
-syn, ack, fin = parse_flags(flags)
-print (f'syn_flag = {syn}, fin_flag={fin}, and ack_flag={ack}')
+# The function used in the client side to recive the ack. 
+def recv_ack(socket):
+    try:
+        msg, addr, seq, ack, syn, ack_flag, fin = recv_packet(socket)
+        if ack_flag:
+            return ack, addr
+        else:
+            return None, None
+    except socket.timeout:
+        return None, None          
