@@ -11,7 +11,8 @@ def main():
     parser.add_argument('-i', '--ip', type=str, default="127.0.0.1", help='Server IP address.')
     parser.add_argument("-f", "--file", type=str, help="File to transfer.")
     parser.add_argument('-p', '--port', default=8088, type=int, help='Server port number.')
-    parser.add_argument('-w', '--window_size', default=3, type=int, help="The window size")
+    parser.add_argument('-w', '--window', default=3, type=int, help="The window size")
+    parser.add_argument('-d', '--discard', type=int, help="Value of seq to skip")
     args = parser.parse_args()
 
     # Check the arguments. If both server and client modes are enabled, print an error message

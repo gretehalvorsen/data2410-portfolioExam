@@ -1,12 +1,11 @@
 import socket
 import datetime
 import time
-from packet import create_packet, send_packet, recv_packet, send_ack
+from header import create_packet, send_packet, recv_packet, send_ack
 
 def server(args):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     server_socket.bind((args.ip, args.port))
-    start_time = None  # initialize start time
     total_data = 0  # initialize total data
     start_time = time.time()
 
@@ -24,6 +23,7 @@ def server(args):
         msg, client_addr, seq, ack, syn, ack_flag, fin = recv_packet(server_socket)
 
         if syn:  # If the SYN flag of the received packet is set
+            start_time = time.time()  # initialize start time
             print("SYN packet is received.")  # Print a message indicating a SYN packet is received
             syn_ack_packet = create_packet(0, 0, 12, b'')  # Create a packet with both SYN and ACK flags set (8 | 4)
             send_packet(server_socket, syn_ack_packet, client_addr)  # Send the SYN-ACK packet back to the client
@@ -50,6 +50,8 @@ def server(args):
             send_packet(server_socket, ack_packet, client_addr)  # Send ACK packet
             print(f'ACK for packet {seq} is sent')
             expected_seq += 1  # Increment expected sequence number
+            total_data += len(msg)
+            
 
         else:  # If an out-of-order packet is received
             print(f'Out-of-order packet {seq} is received, discarding packet')
@@ -58,11 +60,10 @@ def server(args):
             print(f'Resent ACK for packet {expected_seq - 1}')
 
     
-    end_time = time.time()  # ends the timer
-    elapsed_time = end_time - start_time  # calculates the elapsed time
-    throughput = (total_data * 8) / (1000 * 1000 * elapsed_time)  # calculates the throughput in Mbps
-    print('')
-    print(f"The throughput is {throughput:.2f} Mbps")  
-
+    end_time = time.time()  # End time of the file transfer
+    elapsed_time = end_time - start_time  # Total time taken for the file transfer
+    print(f"Total elapsed time: {elapsed_time} seconds")  # Print total elapsed time
+    throughput = (total_data * 8) / (1000 * 1000 * elapsed_time)  # Throughput in Mbps
+    print(f"The throughput is {throughput:.2f} Mbps")
     print(f'Connection Closes') 
     server_socket.close()
