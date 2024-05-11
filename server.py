@@ -48,7 +48,7 @@ def server(args):
                 recvd_file.write(msg[6:])  # Write the data to the file
             ack_packet = create_packet(0, seq, 4, b'')  # Create ACK packet
             send_packet(server_socket, ack_packet, client_addr)  # Send ACK packet
-            print(f"{datetime.datetime.now().strftime('%H:%M:%S.%f')} -- ACK for packet {seq} is sent")
+            print(f"{datetime.datetime.now().strftime('%H:%M:%S.%f')} -- Sending ACK for the received {seq}")
             expected_seq += 1  # Increment expected sequence number
             total_data += len(msg)
             
