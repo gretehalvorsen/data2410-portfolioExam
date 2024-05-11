@@ -43,12 +43,12 @@ def server(args):
             continue  # Continue to the next iteration of the loop without executing the rest of the code in the loop
 
         elif seq == expected_seq:  # If the sequence number is the expected one
-            print(f'Packet {seq} is received')
+            print(f'{datetime.datetime.now().strftime('%H:%M:%S.%f')} -- Packet {seq} is received')
             if not (syn or fin or ack_flag): 
                 recvd_file.write(msg[6:])  # Write the data to the file
             ack_packet = create_packet(0, seq, 4, b'')  # Create ACK packet
             send_packet(server_socket, ack_packet, client_addr)  # Send ACK packet
-            print(f'ACK for packet {seq} is sent')
+            print(f"{datetime.datetime.now().strftime('%H:%M:%S.%f')} -- ACK for packet {seq} is sent")
             expected_seq += 1  # Increment expected sequence number
             total_data += len(msg)
             
