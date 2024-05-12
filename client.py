@@ -58,12 +58,13 @@ def client(args):
             try:
                 _, _, seq, ack, _, ack_flag, _ = recv_packet(client_socket)
                 if ack_flag:  
-                    print(f"{datetime.datetime.now().strftime('%H:%M:%S.%f')} -- Received ACK for sequence number: {ack}")
+                    print(f"{datetime.datetime.now().strftime('%H:%M:%S.%f')} -- ACK for packet = {ack} is received")
                     # Only remove the packet from the window when an ACK specifically for it is received
                     if not sliding_window.empty() and sliding_window.queue[0][0] == ack:
                         sliding_window.get()  
                         base += 1
                     # If a duplicate ACK is received, retransmit all packets in the window
+                        #Er denne nødvendig???
                     else:
                         print(f"{datetime.datetime.now().strftime('%H:%M:%S.%f')} -- Duplicate ACK received. Retransmitting all packets in the window.")
                         for seq, packet in sliding_window.queue:
@@ -71,12 +72,11 @@ def client(args):
                             print(f"{datetime.datetime.now().strftime('%H:%M:%S.%f')} -- Packet with seq = {seq} is resent.")
 
             except socket.timeout:
-                print("Timeout occurred") 
+                print(f"{datetime.datetime.now().strftime('%H:%M:%S.%f')} -- Timeout occurred") 
                 # If a timeout occurs, retransmit all packets in the window
-                print(f"{datetime.datetime.now().strftime('%H:%M:%S.%f')} -- Timeout. Retransmitting all packets in the window.")
                 for seq, packet in sliding_window.queue:
                     send_packet(client_socket, packet, (args.ip, args.port))
-                    print(f"{datetime.datetime.now().strftime('%H:%M:%S.%f')} -- Packet with seq = {seq} is resent.")
+                    print(f"{datetime.datetime.now().strftime('%H:%M:%S.%f')} -- Retransmitting packet with seq = {seq}")
                        
     print()
     print('Connection Teardown:')
