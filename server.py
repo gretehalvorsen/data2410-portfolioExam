@@ -32,6 +32,8 @@ def server(args):
             print(f'SYN-ACK packet is sent')  # Print a message indicating a SYN-ACK packet is sent
 
         elif fin:  # If the FIN flag of the received packet is set
+            end_time = time.time()  # End time of the file transfer
+            print()
             print("FIN packet is received.")  # Print a message indicating a FIN packet is received
             fin_ack_packet = create_packet(0, 0, 6, b'') # Create a packet with both ACK and FIN flags set (4 | 2 )
             send_packet(server_socket, fin_ack_packet, client_addr)  # Send the FIN-ACK packet back to the client
@@ -63,10 +65,10 @@ def server(args):
         else:  # If an out-of-order packet is received
             print(f'{datetime.datetime.now().strftime('%H:%M:%S.%f')} -- out-of-order packet {seq} is received')    
     
-    end_time = time.time()  # End time of the file transfer
+    
     elapsed_time = end_time - start_time  # Total time taken for the file transfer
-    print(f"Total elapsed time: {elapsed_time} seconds")  # Print total elapsed time
     throughput = (total_data * 8) / (1000 * 1000 * elapsed_time)  # Throughput in Mbps
+    print()
     print(f"The throughput is {throughput:.2f} Mbps")
     print(f'Connection Closes') 
     server_socket.close()

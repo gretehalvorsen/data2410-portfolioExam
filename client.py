@@ -6,6 +6,7 @@ from header import create_packet, send_packet, recv_packet
 def client(args):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     client_socket.settimeout(0.5)
+    print()
     print("Connection Establishment Phase:")
     print()
     syn_packet = create_packet(0, 0, 8, b'')# Packet with SYN flag. 
@@ -17,17 +18,20 @@ def client(args):
         try:
             msg, server_addr, seq, ack, syn, ack_flag, fin = recv_packet(client_socket)
             if syn and ack_flag:
-                print("SYN-ACK packet is received.")  # Print a message indicating a SYN-ACK packet is received
+                print("SYN-ACK packet is received")  # Print a message indicating a SYN-ACK packet is received
                 ack_packet = create_packet(0, 0, 4, b'')  # Create a packet with ACK flag set
                 send_packet(client_socket, ack_packet, server_addr)  # Send the ACK packet to complete the three-way handshake
                 print("ACK packet is sent.")  # Print a message indicating an ACK packet is sent
                 break
         except socket.timeout:
-            print("Timeout waiting for SYN-ACK packet. Resending SYN packet.")
-            send_packet(client_socket, syn_packet, (args.ip, args.port))
+            print()
+            print("Connection failed")
+            exit(1)
+        
         #End of the three way handshak
 
         # File transfer part
+    print()
     print(f'Data Transfer:')
     print('')
 
@@ -77,7 +81,8 @@ def client(args):
                 for seq, packet in sliding_window.queue:
                     send_packet(client_socket, packet, (args.ip, args.port))
                     print(f"{datetime.datetime.now().strftime('%H:%M:%S.%f')} -- Retransmitting packet with seq = {seq}")
-                       
+    print(f'DATA finished')
+    print()                 
     print()
     print('Connection Teardown:')
     print()
