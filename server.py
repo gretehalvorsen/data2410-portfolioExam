@@ -15,6 +15,8 @@ def server(args):
         recvd_file = open(args.file, "wb")
 
     expected_seq = 1  # Initialize expected sequence number
+    discard_seq = args.discard
+    last_ack = 0
 
     while True:  # Starts an infinite loop
     # Calls recv_packet function to receive a packet from the client. 
@@ -42,23 +44,33 @@ def server(args):
             print('Connection established')
             continue  # Continue to the next iteration of the loop without executing the rest of the code in the loop
 
+
         elif seq == expected_seq:  # If the sequence number is the expected one
+            if seq == discard_seq:
+                print('Discarding packet with seq number', discard_seq)
+                discard_seq = None  # Reset the discard value so the packet isn't skipped again
+                continue  # Skip the rest of the loop for this packet
+
             print(f'{datetime.datetime.now().strftime('%H:%M:%S.%f')} -- Packet {seq} is received')
             if not (syn or fin or ack_flag): 
                 recvd_file.write(msg[6:])  # Write the data to the file
-            ack_packet = create_packet(0, seq, 4, b'')  # Create ACK packet
-            send_packet(server_socket, ack_packet, client_addr)  # Send ACK packet
-            print(f"{datetime.datetime.now().strftime('%H:%M:%S.%f')} -- Sending ACK for the received {seq}")
-            expected_seq += 1  # Increment expected sequence number
-            total_data += len(msg)
-            
+                ack_packet = create_packet(0, seq, 4, b'')  # Create ACK packet
+                send_packet(server_socket, ack_packet, client_addr)  # Send ACK packet
+                print(f"{datetime.datetime.now().strftime('%H:%M:%S.%f')} -- Sending ACK for the received {seq}")
+                expected_seq += 1  # Increment expected sequence number
+                last_ack = seq  # Update the last acknowledged sequence number
+                total_data += len(msg)
 
         else:  # If an out-of-order packet is received
-            print(f'Out-of-order packet {seq} is received, discarding packet')
-            ack_packet = create_packet(0, expected_seq - 1, 4, b'')  # Resend ACK for last correctly received packet
-            send_packet(server_socket, ack_packet, client_addr)  # Send ACK packet
-            print(f'Resent ACK for packet {expected_seq - 1}')
-
+            print(f'Out-of-order packet {seq} is received')
+            if seq != discard_seq and seq > last_ack:  # If the out-of-order packet is not the discarded one and has not been acknowledged yet
+                ack_packet = create_packet(0, seq, 4, b'')  # Resend ACK for received packet
+                send_packet(server_socket, ack_packet, client_addr)  # Send ACK packet
+                print(f'Sending ACK for received out-of-order packet {seq}')
+                last_ack = seq  # Update the last acknowledged sequence number
+            else:
+                print('Discarding out-of-order packet', discard_seq)
+                discard_seq = None  # Reset the discard value so the packet isn't skipped again
     
     end_time = time.time()  # End time of the file transfer
     elapsed_time = end_time - start_time  # Total time taken for the file transfer
