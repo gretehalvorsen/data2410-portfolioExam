@@ -47,7 +47,6 @@ def server(args):
 
         elif seq == expected_seq:  # If the sequence number is the expected one
             if seq == discard_seq:
-                print('Discarding packet with seq number', discard_seq)
                 discard_seq = None  # Reset the discard value so the packet isn't skipped again
                 continue  # Skip the rest of the loop for this packet
 
@@ -62,15 +61,7 @@ def server(args):
                 total_data += len(msg)
 
         else:  # If an out-of-order packet is received
-            print(f'Out-of-order packet {seq} is received')
-            if seq != discard_seq and seq > last_ack:  # If the out-of-order packet is not the discarded one and has not been acknowledged yet
-                ack_packet = create_packet(0, seq, 4, b'')  # Resend ACK for received packet
-                send_packet(server_socket, ack_packet, client_addr)  # Send ACK packet
-                print(f'Sending ACK for received out-of-order packet {seq}')
-                last_ack = seq  # Update the last acknowledged sequence number
-            else:
-                print('Discarding out-of-order packet', discard_seq)
-                discard_seq = None  # Reset the discard value so the packet isn't skipped again
+            print(f'{datetime.datetime.now().strftime('%H:%M:%S.%f')} -- out-of-order packet {seq} is received')    
     
     end_time = time.time()  # End time of the file transfer
     elapsed_time = end_time - start_time  # Total time taken for the file transfer

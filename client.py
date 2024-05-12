@@ -5,7 +5,7 @@ from header import create_packet, send_packet, recv_packet
 
 def client(args):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    client_socket.settimeout(5)
+    client_socket.settimeout(0.5)
     print("Connection Establishment Phase:")
     print()
     syn_packet = create_packet(0, 0, 8, b'')# Packet with SYN flag. 
@@ -77,31 +77,6 @@ def client(args):
                 for seq, packet in sliding_window.queue:
                     send_packet(client_socket, packet, (args.ip, args.port))
                     print(f"{datetime.datetime.now().strftime('%H:%M:%S.%f')} -- Packet with seq = {seq} is resent.")
-            '''
-            try:
-                _, _, seq, ack, _, ack_flag, _ = recv_packet(client_socket)
-                if ack_flag and ack >= base:  
-                    print(f"{datetime.datetime.now().strftime('%H:%M:%S.%f')} -- Received ACK for sequence number: {ack}")
-                    while not sliding_window.empty() and sliding_window.queue[0][0] <= ack:
-                        seq, _ = sliding_window.get()  
-                        if seq == base:  
-                            base += 1
-                        elif ack_flag:
-                            # If a duplicate ACK is received, retransmit all packets in the window
-                            print(f"{datetime.datetime.now().strftime('%H:%M:%S.%f')} -- Duplicate ACK received. Retransmitting all packets in the window.")
-                            for seq, packet in sliding_window.queue:
-                                send_packet(client_socket, packet, (args.ip, args.port))
-                                print(f"{datetime.datetime.now().strftime('%H:%M:%S.%f')} -- Packet with seq = {seq} is resent.")
-                        
-             
-            except socket.timeout:
-                print("Timeout occurred") 
-                 # If a timeout occurs, retransmit all packets in the window
-                print(f"{datetime.datetime.now().strftime('%H:%M:%S.%f')} -- Timeout. Retransmitting all packets in the window.")
-                for seq, packet in sliding_window.queue:
-                    send_packet(client_socket, packet, (args.ip, args.port))
-                    print(f"{datetime.datetime.now().strftime('%H:%M:%S.%f')} -- Packet with seq = {seq} is resent.")        
-'''
                        
     print()
     print('Connection Teardown:')
@@ -114,7 +89,7 @@ def client(args):
     # Start of teardown
     while True:
         try:
-            msg, server_addr, seq, ack, syn, ack_flag, fin = recv_packet(client_socket)
+            _, server_addr, seq, ack, syn, ack_flag, _ = recv_packet(client_socket)
             if ack_flag:
                 print("FIN-ACK packet is received.")  # Print a message indicating a SYN-ACK packet is received
                 print('Connection closes')
