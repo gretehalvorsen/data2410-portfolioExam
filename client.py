@@ -4,6 +4,9 @@ import datetime
 from header import create_packet, send_packet, recv_packet
 
 def client(args):
+    if args.file is None:
+        print("Error: You must specify a file to send when using client mode.")
+        return
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     client_socket.settimeout(0.5)
     print()

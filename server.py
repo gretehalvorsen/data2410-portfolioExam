@@ -52,7 +52,7 @@ def server(args):
                 discard_seq = None  # Reset the discard value so the packet isn't skipped again
                 continue  # Skip the rest of the loop for this packet
 
-            print(f'{datetime.datetime.now().strftime('%H:%M:%S.%f')} -- Packet {seq} is received')
+            print(f"{datetime.datetime.now().strftime('%H:%M:%S.%f')} -- Packet {seq} is received")
             if not (syn or fin or ack_flag): 
                 recvd_file.write(msg[6:])  # Write the data to the file
                 ack_packet = create_packet(0, seq, 4, b'')  # Create ACK packet
@@ -63,7 +63,7 @@ def server(args):
                 total_data += len(msg)
 
         else:  # If an out-of-order packet is received
-            print(f'{datetime.datetime.now().strftime('%H:%M:%S.%f')} -- out-of-order packet {seq} is received')    
+            print(f"{datetime.datetime.now().strftime('%H:%M:%S.%f')} -- out-of-order packet {seq} is received")    
     
     
     elapsed_time = end_time - start_time  # Total time taken for the file transfer
