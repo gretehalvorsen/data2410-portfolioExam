@@ -3,7 +3,16 @@ from client import client
 import argparse
 import re
 from struct import *
+"""
+    This function parses command-line arguments and runs as a server or client based on these arguments.
 
+    Exceptions:
+        If both server and client modes are enabled, the function prints an error message and exits.
+        If the provided port is not within the valid range [1024, 65535], it prints an error message and exits.
+        If the provided IP address is invalid, it prints an error message and exits.
+        If a file is provided and it's not a .jpg file, it prints an error message and exits.
+        If neither server nor client mode is enabled, it prints an error message and exits.
+    """
 def main():
     # Create a parser object to handle command-line arguments
     # Add arguments to the parser
@@ -12,7 +21,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--client", action="store_true", help="Run as client.")
     parser.add_argument("-s", "--server", action="store_true", help="Run as server.")
-    parser.add_argument('-i', '--ip', type=str, default="10.0.1.2", help='Server IP address.')
+    parser.add_argument('-i', '--ip', type=str, default="127.0.0.1", help='Server IP address.')
     parser.add_argument("-f", "--file", type=str, help="File to transfer.")
     parser.add_argument('-p', '--port', default=8080, type=int, help='Server port number.')
     parser.add_argument('-w', '--window', default=3, type=int, help="The window size")

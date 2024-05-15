@@ -13,10 +13,10 @@ a binary string (header) and combines it with the data to form the
 complete packet.
 
 Arguments:
-seq: The sequence number for the packet.
-ack: The acknowledgment number for the packet.
-flags: An integer representing the flags (SYN, ACK, FIN) for the packet.
-data: The actual data or payload of the packet.
+    seq: The sequence number for the packet.
+    ack: The acknowledgment number for the packet.
+    flags: An integer representing the flags (SYN, ACK, FIN) for the packet.
+    data: The actual data or payload of the packet.
 
 Returns the final packet as a combination of the header and data.
 '''
@@ -35,7 +35,7 @@ It unpacks the binary string to get the sequence number,
 acknowledgment number, and flags
 
 Arguments:
-header: The header of the packet as a binary string.
+    header: The header of the packet as a binary string.
 
 It returns sequence number, acknowledgment number, and flags as separate variables.
 '''
@@ -51,9 +51,9 @@ send_packet() function sends a packet over a socket to a specified address.
 It uses the sendto method of the socket object to send the packet to a given address.
 
 Arguments:
-socket: The socket over which to send the packet.
-packet: The package to be sent.
-addr: The address to which the packet is sent.
+    socket: The socket over which to send the packet.
+    packet: The package to be sent.
+    addr: The address to which the packet is sent.
 '''
 # Function to send a packet over a socket to a specified address.
 def send_packet(socket, packet, addr):
@@ -67,8 +67,8 @@ Uses the recvfrom method of the socket object to receive
 a packet and parses the header of the received message.
 
 Arguments:
-socket: The socket from which to receive the packet.
-size: The size of the packet to receive. By default, it's 1000 bytes.
+    socket: The socket from which to receive the packet.
+    size: The size of the packet to receive. By default, it's 1000 bytes.
 
 Return the message, sender's address, sequence number, acknowledgment number, and flags.
 '''    
@@ -89,7 +89,7 @@ Checks each bit in the flags integer using bitwise
 operations to get the SYN, ACK, and FIN flags.
 
 Arguments:
-flags: An integer representing the flags.
+    flags: An integer representing the flags.
 
 Returns the SYN, ACK, and FIN flags as separate variables.
 '''
@@ -106,10 +106,10 @@ def parse_flags(flags):
  and sends it over the socket to the given address.
 
 Arguments:
-socket: The socket over which to send the ACK.
-seq: The sequence number for the ACK.
-addr: The address to which the ACK is sent.
-'''
+    socket: The socket over which to send the ACK.
+    seq: The sequence number for the ACK.
+    addr: The address to which the ACK is sent.
+    '''
 def send_ack(socket, seq, addr):
     # Create an ACK packet. The sequence number and acknowledgment number are 0, 
     # the flags integer is 4 (which represents an ACK), and there's no data.
