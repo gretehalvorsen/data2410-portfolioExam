@@ -1,10 +1,10 @@
 # Import necessary libraries
 from struct import *
+import datetime
 
 
 # Define the format for the packet header, which consists of 3 unsigned short integers (each represented by 'H').
 header_format = '3H' 
-
 
 '''
 Create_packet function creates a packet with a header and data.
@@ -52,7 +52,7 @@ It uses the sendto method of the socket object to send the packet to a given add
 
 Arguments:
 socket: The socket over which to send the packet.
-packet: The packet to be sent.
+packet: The package to be sent.
 addr: The address to which the packet is sent.
 '''
 # Function to send a packet over a socket to a specified address.
@@ -72,7 +72,7 @@ size: The size of the packet to receive. By default, it's 1000 bytes.
 
 Return the message, sender's address, sequence number, acknowledgment number, and flags.
 '''    
-def recv_packet(socket, size=1000):
+def receive_packet(socket, size=1000):
     # Use the recvfrom method of the socket object to receive a packet. The default size of the packet is 1000 bytes.
     msg, addr = socket.recvfrom(size)
     # Parse the header of the received message to get the sequence number, acknowledgment number, and flags.
@@ -102,7 +102,6 @@ def parse_flags(flags):
     return syn, ack, fin
 
 
-
 '''send_ack() function creates an ACK packet
  and sends it over the socket to the given address.
 
@@ -112,37 +111,8 @@ seq: The sequence number for the ACK.
 addr: The address to which the ACK is sent.
 '''
 def send_ack(socket, seq, addr):
-    # Create an ACK packet. The sequence number and acknowledgment number are 0, the flags integer is 4 (which represents an ACK), and there's no data.
+    # Create an ACK packet. The sequence number and acknowledgment number are 0, 
+    # the flags integer is 4 (which represents an ACK), and there's no data.
     ack_packet = create_packet(0, 0, 4, b'')
     # Send the ACK packet.
     send_packet(socket, ack_packet, addr)
-
-
-
-'''
-recv_ack() function receives a packet and checks if it's an ACK. 
-If a timeout occurs while waiting to receive a packet, it returns None for both values.
-
-Arguments:
-socket: The socket from which to receive the ACK.
-
-If the packet is an ACK, it returns the acknowledgment number and sender's address. 
-If it is not an ACK or if a timeout occurs, it returns None for both values.
-
-Exception: If a socket.timeout exception occurs, it returns None for both values. This means that 
-the function will not raise an exception if a timeout occurs; instead, it will handle it and return None
-'''
-# Function to receive an ACK in the client side.
-def recv_ack(socket):
-    try:
-        # Receive a packet.
-        msg, addr, seq, ack, syn, ack_flag, fin = recv_packet(socket)
-        # If the packet is an ACK (ack_flag is True), return the acknowledgment number and sender's address.
-        if ack_flag:
-            return ack, addr
-        # If the packet is not an ACK, return None for both values.
-        else:
-            return None, None
-    # If a timeout occurs while waiting to receive a packet, return None for both values.
-    except socket.timeout:
-        return None, None
