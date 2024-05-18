@@ -80,7 +80,7 @@ def client(args):
                     send_packet(client_socket, data_packet, (args.ip, args.port))
                     # Add the packet to the sliding window
                     sliding_window.put((nextseqnum, data_packet))
-                    # Print a message indicating the packet has been sent and the current sliding window
+                    # Print a message indicating the packet has been sent and the current packets in flight
                     seq_nums = [str(seq) for seq, _ in list(sliding_window.queue)]
                     print(f"{datetime.datetime.now().strftime('%H:%M:%S.%f')} -- Packet with seq = {nextseqnum} is sent. Sliding window:  {', '.join(seq_nums)}")
                     # Increment the sequence number
