@@ -33,13 +33,13 @@ def server(args):
 
     while True:  
     # Calls receive_packet function to receive a packet from the client. 
-        msg, client_addr, seq, ack, syn, ack_flag, fin = receive_packet(server_socket)
+        msg, client_addr, seq, ack, syn_flag, ack_flag, fin_flag = receive_packet(server_socket)
 
         #Test to see if the server already has a connection with a client
         if serving_client and client_addr != client_addr_serving:
             continue  # skip this loop iteration if another client is trying to connect
 
-        if syn:  # If the SYN flag of the received packet is set
+        if syn_flag:  # If the SYN flag of the received packet is set
             start_time = time.time()  # initialize start time
             serving_client = True  # set serving_client to True when a client connects
             client_addr_serving = client_addr  # keep track of the client being served
@@ -48,7 +48,7 @@ def server(args):
             send_packet(server_socket, syn_ack_packet, client_addr)  # Send the SYN-ACK packet back to the client
             print(f'SYN-ACK packet is sent')  # Print a message indicating a SYN-ACK packet is sent
 
-        elif fin:  # If the FIN flag of the received packet is set
+        elif fin_flag:  # If the FIN flag of the received packet is set
             end_time = time.time()  # End time of the file transfer
             serving_client = False  # set serving_client to False when the client disconnects
             print("\nFIN packet is received.")  # Print a message indicating a FIN packet is received
@@ -72,7 +72,7 @@ def server(args):
                 continue 
 
             print(f"{datetime.datetime.now().strftime('%H:%M:%S.%f')} -- Packet {seq} is received")
-            if not (syn or fin or ack_flag): 
+            if not (syn_flag or fin_flag or ack_flag): 
                 received_file.write(msg[6:])  # Write the data to the file
                 ack_packet = create_packet(0, seq, 4, b'')  # Create ACK packet
                 send_packet(server_socket, ack_packet, client_addr)  # Send ACK packet
