@@ -1,8 +1,20 @@
 # DATA2410 Reliable Transport Protocol (DRTP)
 
-In this project, my aim is to design and develop the DATA2410 Reliable Transport Protocol (DRTP) - a simple reliable data transfer protocol, built upon UDP. It is specifically engineered to guarantee reliable data delivery in the correct sequence, eliminating any instances of missing or duplicate data.
+In this project, my aim was to design and develop the DATA2410 Reliable Transport Protocol (DRTP) - a simple reliable data transfer protocol, built upon UDP. It is specifically engineered to guarantee reliable data delivery in the correct sequence, eliminating any instances of missing or duplicate data.
 
 The result is an executable file transfer application, application.py. This application is programmed to use command-line arguments to trigger a client and server. The client's role is to read a jpeg file from the system and dispatch it via DRTP/UDP. The filename, server address, and port number are all provided as command-line arguments. Additionally, you have the option to define a preferred window size for file transfer.
+
+## How to Run
+
+1. Open a terminal.
+2. Navigate to the directory where `application.py` is located.
+3. To start the server with default values, use the command: 
+`python3 application.py -s -i your_ip -p your_port`. 
+Replace `your_ip` and `your_port` with your desired IP address and port number.
+To run with default values ip: 10.0.1.2 and port: 8088 use command:
+`python3 application.py -s`
+4. To start the client, use the command: `python3 application.py -c -i server_ip -p server_port`
+Or run with default values: `python3 application.py -c`
 
 ## Command Line Arguments
 
