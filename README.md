@@ -36,7 +36,6 @@ The following arguments are available for configuration:
 The foundation for my code is based on previous assignments, lab exercises, as well as sample code provided on [github - DATA2410](https://github.com/safiqul/2410), and within "Computer Networking: A Top-Down Approach." I also used Sikt KI-chat as a tool for identifying and resolving bugs in the code.
 
 
-At the start of the assignment, I drew inspiration for my own work from code provided by one of the [Teaching Assistants](https://github.com/HamidHamrah/DRTP). However, the GitHub repository containing this code has since been set to private. Since initially viewing it, my code has undergone several changes.
-[](https://github.com/HamidHamrah/DRTP)
+At the start of the assignment, I drew inspiration for my own work from code provided by one of the [Teaching Assistants](https://github.com/HamidHamrah/DRTP). However, the GitHub repository containing this code has since been set to private. 
 
   |
