@@ -8,12 +8,12 @@ The result is an executable file transfer application, application.py. This appl
 
 1. Open a terminal.
 2. Navigate to the directory where `application.py` is located.
-3. To start the server with default values, use the command: 
-`python3 application.py -s -i your_ip -p your_port`. 
+3. To start the server with default values, use the command: <br>
+`python3 application.py -s -i your_ip -p your_port`. <br>
 Replace `your_ip` and `your_port` with your desired IP address and port number.
-To run with default values ip: 10.0.1.2 and port: 8088 use command:
-`python3 application.py -s`
-4. To start the client, use the command: `python3 application.py -c -i server_ip -p server_port`
+To run with default values ip: 10.0.1.2 and port: 8088 use command: <br>
+`python3 application.py -s` <br>
+4. To start the client, use the command: `python3 application.py -c -i server_ip -p server_port` <br>
 Or run with default values: `python3 application.py -c`
 
 ## Command Line Arguments
