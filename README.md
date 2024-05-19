@@ -38,4 +38,3 @@ The foundation for my code is based on previous assignments, lab exercises, as w
 
 At the start of the assignment, I drew inspiration for my own work from code provided by one of the [Teaching Assistants](https://github.com/HamidHamrah/DRTP). However, the GitHub repository containing this code has since been set to private. 
 
-  |
