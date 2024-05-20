@@ -1,7 +1,7 @@
 import socket
 import queue
 import datetime
-from header import create_packet, send_packet, receive_packet
+from utilities import create_packet, send_packet, receive_packet
 
 '''
     client(args) function performs the client side operations of 
